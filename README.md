@@ -33,6 +33,3 @@ Technically, it doesn't track changes. It tracks calls to `deref_mut()`
 so it is entirely possible to call `deref_mut()` and not change it, giving a false positive.
 
 Along with that, there is a function to mutate a `Cd` without tripping change detection. 
-However, it is marked unsafe, since unsafe declares that there are contracts the compiler can't check.
-If Cd promises that you can't mutate it without it knowing, then it must uphold that.
-But in case you really really need to, there is the unsafe `mutate_silently()`.

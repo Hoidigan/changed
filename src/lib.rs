@@ -33,9 +33,6 @@
 //! so it is entirely possible to call `deref_mut()` and not change it, giving a false positive.
 //! 
 //! Along with that, there is a function to mutate a `Cd` without tripping change detection. 
-//! However, it is marked unsafe, since unsafe declares that there are contracts the compiler can't check.
-//! If Cd promises that you can't mutate it without it knowing, then it must uphold that.
-//! But in case you really really need to, there is the unsafe `mutate_silently()`.
 
 use std::ops::{Deref, DerefMut};
 
@@ -113,24 +110,14 @@ impl<T> Cd<T> {
     }
 
     /// Mutate the Cd without tripping change detection.
-    ///
-    /// # Safety
-    /// This is marked unsafe since this library guarantees that Cd cannot be changed
-    /// without tripping change detection.
-    ///
-    /// However, in case you really really need to, 
-    /// this function allows you to mutate it without change detection.
-    ///
-    /// Nothing about this is memory unsafe or type unsafe, it just violates the contracts made by Cd.
+    /// 
     /// ```
     /// use changed::Cd;
     /// let mut cd = Cd::new(5);
-    /// unsafe {
-    ///     *cd.mutate_silently() += 5;
-    /// }
+    /// *cd.mutate_silently() += 5;
     /// assert!(!cd.changed());
     /// ```
-    pub unsafe fn mutate_silently(&mut self) -> &mut T {
+    pub fn mutate_silently(&mut self) -> &mut T {
         &mut self.data
     }
 }
