@@ -9,7 +9,6 @@ homepage = "https://github.com/Hoidigan/changed"
 repository = "https://github.com/Hoidigan/changed"
 # Docs are autolinked to docs.rs
 readme = "README.md"
-keywords = ["change detection"]
 categories = ["data-structures"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
