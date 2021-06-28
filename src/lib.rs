@@ -1,11 +1,6 @@
 //! `Cd`: A "smart pointer" that tracks changes to the data it owns.
 //! 
 //! ## Usage
-//! Put changed in your Cargo.toml like so
-//! ```txt
-//! changed = 0.1.0
-//! ```
-//! Then in your code:
 //! ```
 //! use changed::Cd;
 //! 
