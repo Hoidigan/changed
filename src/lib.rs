@@ -2,7 +2,7 @@
 //! 
 //! ## Usage
 //! Put changed in your Cargo.toml like so
-//! ```
+//! ```txt
 //! changed = 0.1.0
 //! ```
 //! Then in your code:
@@ -10,7 +10,7 @@
 //! use changed::Cd;
 //! 
 //! // Create the change tracker with an i32
-//! let mut test: Changed<i32> = Changed::new(20);
+//! let mut test: Cd<i32> = Cd::new(20);
 //! 
 //! // Mutate it (calling deref_mut through the *)
 //! *test += 5;
@@ -50,6 +50,11 @@ pub struct Cd<T> {
 impl<T> Cd<T> {
     /// Create a new Cd with data.
     /// It is initialized to false for change detection.
+    ///
+    /// ```
+    /// use changed::Cd;
+    /// let cd = Cd::new(5);
+    /// ```
     pub fn new(data: T) -> Cd<T> {
         Cd {
             data,
@@ -59,6 +64,11 @@ impl<T> Cd<T> {
 
     /// Create a new Cd with data.
     /// It is initialized to true for change detection.
+    /// ```
+    /// use changed::Cd;
+    /// let cd = Cd::new_true(5);
+    /// assert!(cd.changed());
+    /// ```
     pub fn new_true(data: T) -> Cd<T> {
         Cd {
             data,
@@ -67,17 +77,37 @@ impl<T> Cd<T> {
     }
 
     /// Reset the change tracking to false.
+    /// ```
+    /// use changed::Cd;
+    /// let mut cd = Cd::new_true(5);
+    /// cd.reset();
+    /// assert!(!cd.changed());
+    /// ```
     pub fn reset(&mut self) {
         self.changed = false;
     }
 
     /// Take the data out of the Cd.
     /// Consumes self and returns data.
+    /// ```
+    /// use changed::Cd;
+    /// let cd = Cd::new(5);
+    /// let data = cd.take();
+    /// // Error: cd has been moved.
+    /// // cd.changed();
+    /// ```
     pub fn take(self) -> T {
         self.data
     }
 
     /// Check if the Cd has been changed since the last call to reset (or created.)
+    /// ```
+    /// use changed::Cd;
+    /// let mut cd = Cd::new(5);
+    /// assert!(!cd.changed());
+    /// *cd += 5;
+    /// assert!(cd.changed());
+    /// ```
     pub fn changed(&self) -> bool {
         self.changed
     }
@@ -92,6 +122,14 @@ impl<T> Cd<T> {
     /// this function allows you to mutate it without change detection.
     ///
     /// Nothing about this is memory unsafe or type unsafe, it just violates the contracts made by Cd.
+    /// ```
+    /// use changed::Cd;
+    /// let mut cd = Cd::new(5);
+    /// unsafe {
+    ///     *cd.mutate_silently() += 5;
+    /// }
+    /// assert!(!cd.changed());
+    /// ```
     pub unsafe fn mutate_silently(&mut self) -> &mut T {
         &mut self.data
     }
