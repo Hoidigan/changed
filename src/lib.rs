@@ -135,6 +135,13 @@ impl<T> Cd<T> {
     }
 }
 
+/// deref does not trip change detection.
+/// ```
+/// use changed::Cd;
+/// let cd = Cd::new(5);
+/// assert_eq!(*cd, 5); // deref for == 5
+/// assert!(!cd.changed()); // .changed() is false
+/// ```
 impl<T> Deref for Cd<T> {
     type Target = T;
 
@@ -143,6 +150,14 @@ impl<T> Deref for Cd<T> {
     }
 }
 
+/// deref_mut trips change detection.
+/// ```
+/// use changed::Cd;
+/// let mut cd = Cd::new(5);
+/// *cd += 5; // deref_mut for add assign
+/// assert_eq!(*cd, 10);
+/// assert!(cd.changed()); // .changed() is true
+/// ```
 impl<T> DerefMut for Cd<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.changed = true;
@@ -150,6 +165,13 @@ impl<T> DerefMut for Cd<T> {
     }
 }
 
+/// Impl default where the data impls default. Change detection is initialized to false.
+/// ```
+/// use changed::Cd;
+/// // 0 is default for i32.
+/// let zero: Cd<i32> = Cd::default();
+/// assert!(!zero.changed());
+/// ```
 impl<T: Default> Default for Cd<T> {
     fn default() -> Self {
         Cd::new(T::default())
