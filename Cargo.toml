@@ -1,9 +1,16 @@
 [package]
 name = "changed"
+# Sticking with 0.1.0 until it's been used a bit to see if anything needs to change
 version = "0.1.0"
 edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "Simple change detection"
+homepage = "https://github.com/Hoidigan/changed"
+repository = "https://github.com/Hoidigan/changed"
+# Docs are autolinked to docs.rs
+readme = "README.md"
+keywords = ["change detection"]
+categories = ["data-structures"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
