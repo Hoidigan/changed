@@ -30,6 +30,7 @@
 //! Along with that, there is a function to mutate a `Cd` without tripping change detection. 
 
 use std::ops::{Deref, DerefMut};
+use std::fmt;
 
 /// Cd: Change Detection
 ///
@@ -157,6 +158,22 @@ impl<T> DerefMut for Cd<T> {
 impl<T: Default> Default for Cd<T> {
     fn default() -> Self {
         Cd::new(T::default())
+    }
+}
+
+impl <T: Clone> Clone for Cd<T> {
+    fn clone(&self) -> Self {
+        Cd {
+            data: self.data.clone(),
+            changed: self.changed
+        }
+    }
+}
+
+impl <T: fmt::Debug> fmt::Debug for Cd<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Cd").field("data", &self.data)
+                            .field("changed", &self.changed).finish()
     }
 }
 
