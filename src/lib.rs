@@ -11,16 +11,16 @@
 //! *test += 5;
 //! 
 //! // changed() reports whether or not it was changed
-//! assert!(test.changed());
+//! assert!(Cd::changed(&test));
 //! 
 //! // Reset the tracker back to false
-//! test.reset();
+//! Cd::reset(&mut test);
 //! 
 //! // Read the data
 //! assert_eq!(*test, 25);
 //! 
 //! // That didn't trip the change detection!
-//! assert!(!test.changed());
+//! assert!(!Cd::changed(&test));
 //! ```
 //! 
 //! ## How it works
@@ -60,7 +60,7 @@ impl<T> Cd<T> {
     /// ```
     /// use changed::Cd;
     /// let cd = Cd::new_true(5);
-    /// assert!(cd.changed());
+    /// assert!(Cd::changed(&cd));
     /// ```
     pub fn new_true(data: T) -> Cd<T> {
         Cd {
@@ -69,53 +69,55 @@ impl<T> Cd<T> {
         }
     }
 
+
     /// Reset the change tracking to false.
     /// ```
     /// use changed::Cd;
     /// let mut cd = Cd::new_true(5);
-    /// cd.reset();
-    /// assert!(!cd.changed());
+    /// Cd::reset(&mut cd);
+    /// assert!(!Cd::changed(&cd));
     /// ```
-    pub fn reset(&mut self) {
-        self.changed = false;
+    pub fn reset(this: &mut Cd<T>) {
+        this.changed = false;
     }
 
     /// Take the data out of the Cd.
-    /// Consumes self and returns data.
+    /// Consumes this and returns data.
     /// ```
     /// use changed::Cd;
     /// let cd = Cd::new(5);
-    /// let data = cd.take();
+    /// let data = Cd::take(cd);
     /// // Error: cd has been moved.
-    /// // cd.changed();
+    /// // Cd::changed(&cd);
     /// ```
-    pub fn take(self) -> T {
-        self.data
+    pub fn take(this: Cd<T>) -> T {
+        this.data
     }
 
     /// Check if the Cd has been changed since the last call to reset (or created.)
     /// ```
     /// use changed::Cd;
     /// let mut cd = Cd::new(5);
-    /// assert!(!cd.changed());
+    /// assert!(!Cd::changed(&cd));
     /// *cd += 5;
-    /// assert!(cd.changed());
+    /// assert!(Cd::changed(&cd));
     /// ```
-    pub fn changed(&self) -> bool {
-        self.changed
+    pub fn changed(this: &Cd<T>) -> bool {
+        this.changed
     }
 
     /// Mutate the Cd without tripping change detection.
-    /// 
+    ///
     /// ```
     /// use changed::Cd;
     /// let mut cd = Cd::new(5);
-    /// *cd.mutate_silently() += 5;
-    /// assert!(!cd.changed());
+    /// *Cd::silent_mut(&mut cd) += 5;
+    /// assert!(!Cd::changed(&cd));
     /// ```
-    pub fn mutate_silently(&mut self) -> &mut T {
-        &mut self.data
+    pub fn silent_mut(this: &mut Cd<T>) -> &mut T {
+        &mut this.data
     }
+
 }
 
 /// deref does not trip change detection.
@@ -123,7 +125,7 @@ impl<T> Cd<T> {
 /// use changed::Cd;
 /// let cd = Cd::new(5);
 /// assert_eq!(*cd, 5); // deref for == 5
-/// assert!(!cd.changed()); // .changed() is false
+/// assert!(!Cd::changed(&cd)); // .changed() is false
 /// ```
 impl<T> Deref for Cd<T> {
     type Target = T;
@@ -139,7 +141,7 @@ impl<T> Deref for Cd<T> {
 /// let mut cd = Cd::new(5);
 /// *cd += 5; // deref_mut for add assign
 /// assert_eq!(*cd, 10);
-/// assert!(cd.changed()); // .changed() is true
+/// assert!(Cd::changed(&cd)); // .changed() is true
 /// ```
 impl<T> DerefMut for Cd<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
@@ -153,7 +155,7 @@ impl<T> DerefMut for Cd<T> {
 /// use changed::Cd;
 /// // 0 is default for i32.
 /// let zero: Cd<i32> = Cd::default();
-/// assert!(!zero.changed());
+/// assert!(!Cd::changed(&zero));
 /// ```
 impl<T: Default> Default for Cd<T> {
     fn default() -> Self {
@@ -183,11 +185,11 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let mut changed = Cd::new(15);
-        *changed += 5;
-        assert!(changed.changed);
-        changed.reset();
-        assert_eq!(*changed, 20);
-        assert!(!changed.changed);
+        let mut cd = Cd::new(15);
+        *cd += 5;
+        assert!(Cd::changed(&cd));
+        Cd::reset(&mut cd);
+        assert_eq!(*cd, 20);
+        assert!(!Cd::changed(&cd));
     }
 }
