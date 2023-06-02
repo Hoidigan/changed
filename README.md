@@ -5,7 +5,7 @@
 use changed::Cd;
 
 // Create the change tracker with an i32
-let mut test: Changed<i32> = Changed::new(20);
+let mut test: Cd<i32> = Cd::new(20);
 
 // Mutate it (calling deref_mut through the *)
 *test += 5;
@@ -23,8 +23,10 @@ assert_eq!(*test, 25);
 assert!(!test.changed());
 ```
 
-## How it works
-Technically, it doesn't track changes. It tracks calls to `deref_mut()`
-so it is entirely possible to call `deref_mut()` and not change it, giving a false positive.
+## How It Works
+Technically, it doesn't track changes. It tracks calls to `deref_mut()` so it is
+entirely possible to call `deref_mut()` and not change it, giving a false
+positive.
 
-Along with that, there is a function to mutate a `Cd` without tripping change detection. 
+Along with that, there is a function to mutate a `Cd` without tripping change
+detection.
