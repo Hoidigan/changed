@@ -24,10 +24,13 @@
 //! ```
 //! 
 //! ## How it works
-//! Technically, it doesn't track changes. It tracks calls to `deref_mut()`
-//! so it is entirely possible to call `deref_mut()` and not change it, giving a false positive.
+//!
+//! Technically, it doesn't track changes. It tracks calls to `deref_mut()` so
+//! it is entirely possible to call `deref_mut()` and not change it, giving a
+//! false positive.
 //! 
-//! Along with that, there is a function to mutate a `Cd` without tripping change detection. 
+//! Along with that, the function `silent_mut()` can mutate a `Cd` without
+//! tripping change detection.
 
 use std::ops::{Deref, DerefMut};
 use std::fmt;
@@ -68,7 +71,6 @@ impl<T> Cd<T> {
             changed: true,
         }
     }
-
 
     /// Reset the change tracking to false.
     /// ```
@@ -150,7 +152,7 @@ impl<T> DerefMut for Cd<T> {
     }
 }
 
-/// Impl default where the data impls default. Change detection is initialized to false.
+/// Impl Default where the data impls Default. Change detection is initialized to false.
 /// ```
 /// use changed::Cd;
 /// // 0 is default for i32.
@@ -163,6 +165,16 @@ impl<T: Default> Default for Cd<T> {
     }
 }
 
+/// Impl Clone where the data impls Clone. Change flag is copied from source.
+/// ```
+/// use changed::Cd;
+/// // 0 is default for i32.
+/// let mut name: Cd<String> = Cd::new("Hi".into());
+/// name.push('!');
+/// let clone = name.clone();
+/// assert!(Cd::changed(&name));
+/// assert!(Cd::changed(&clone));
+/// ```
 impl <T: Clone> Clone for Cd<T> {
     fn clone(&self) -> Self {
         Cd {
@@ -172,6 +184,12 @@ impl <T: Clone> Clone for Cd<T> {
     }
 }
 
+/// Impl Debug where the data impls Debug.
+/// ```
+/// use changed::Cd;
+/// let zero: Cd<i32> = Cd::default();
+/// assert_eq!("Cd { data: 0, changed: false }", format!("{:?}", &zero));
+/// ```
 impl <T: fmt::Debug> fmt::Debug for Cd<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Cd").field("data", &self.data)
